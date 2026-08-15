@@ -117,7 +117,7 @@ var CONTENIDO = {
       exposicion: "",
       año: "2025",
       descripcion: "naturAI 3.0 simboliza un intercambio de señales, datos e información que forman lo que vemos, lo que definimos, lo que creamos y lo que será creado por la futura AI.",
-      imgs: ["NaturAI-1.0-foto_02.jpeg", "naturAI 3.0 close.jpeg"],
+      imgs: ["naturAI 3.0 01.jpeg", "naturAI 3.0 close.jpeg"],
       videos: ["videos/naturAI 3.0 001.mp4"],
       links: []
     },
