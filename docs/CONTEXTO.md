@@ -1,100 +1,119 @@
 # PROYECTO TACHOATOMICO
 
+Sitio estático (HTML/CSS/JS) del artista **TACHOATOMICO** (José Ricardo Moreno Chejab).
+
+- **Repositorio GitHub**: `tachoatomico/portal` (rama `main`)
+- **Despliegue**: Coolify en VPS `207.180.242.253` → `tachoatomico.poordesigner.com`
+- **Media** (imágenes y videos) alojados en el propio repositorio (carpetas `imagenes/` y `videos/`)
+
+---
+
 ## Estructura del proyecto
 
 ```
 /
-├── index.html              # Página principal web (menú: bio, arte, expo)
+├── index.html              # Página principal (menú: bio, arte, expo, videos)
+├── tachoatomico.html       # Duplicado de la principal (legado, no usar)
 ├── cv.html                 # CV / Hoja de vida
-├── bio.html                # Página interior — biografía
-├── arte.html               # Página interior — obras de arte
-├── expo.html               # Página interior — exposiciones
+├── portafolio.html         # Portafolio completo (declaración + arte + exposiciones, printable)
 │
-├── content.js              # TODO el texto centralizado (único lugar para editar)
+├── bio.html                # Página interior — biografía
+├── arte.html               # Página interior — obras agrupadas por serie
+├── expo.html               # Página interior — exposiciones
+├── videos.html             # Página interior — reproductores de video por obra
+│
+├── content.js              # TODO el texto y datos centralizados (único lugar para editar)
 ├── components.js           # Funciones compartidas (headers, navs, renders)
 │
-├── imagenes/               # Imágenes del sitio
-│   ├── logo_sign.png       # Logo principal (fondo claro)
-│   ├── logo_sign_white.png # Logo para fondo oscuro
-│   ├── atom.png            # Punto decorativo para menús
-│   ├── g13.png
-│   └── *.jpg, *.jpeg, *.png  # Fotos de obras y exposiciones
+├── imagenes/               # Imágenes (obras, exposiciones, logo)
+├── videos/                 # Videos .mp4 (uno o varios por obra)
 │
 ├── fonts/
-│   └── Moonlite Solid.otf  # Tipografía del título y menús
+│   └── Moonlite Solid.otf  # Tipografía de títulos y menús
 │
 ├── hojadevida/
 │   └── 2025 hv tachoatomico.pdf  # PDF original escaneado
 │
 └── docs/
-    └── CONTEXTO.md         # Este archivo
+    ├── CONTEXTO.md         # Este archivo
+    └── contexto_coolify/   # Datos del servidor y flujo de deploy
 ```
-
-## Arquitectura del sistema
-
-### content.js
-Único archivo donde se edita el contenido. Está dividido en secciones:
-
-- `CONTENIDO.bio` — array de párrafos para la biografía
-- `CONTENIDO.perfil` — texto del perfil profesional (index)
-- `CONTENIDO.academico` — array de objetos {year, role, place}
-- `CONTENIDO.arte_trayectoria` — array de objetos {year, role, desc}
-- `CONTENIDO.laboral` — array de objetos {year, role, place}
-- `CONTENIDO.proyectos` — array de proyectos del portafolio
-- `CONTENIDO.exposiciones` — array de exposiciones (para index)
-- `CONTENIDO.obras` — array de obras de arte (para arte.html)
-- `CONTENIDO.expo_list` — array de exposiciones (para expo.html)
-
-### components.js
-Funciones que renderizan HTML compartido:
-- `renderMainHeader()` — header para index y tachoatomico
-- `renderInnerHeader()` — header para bio, arte, expo
-- `agregarPuntos()` — puntos aleatorios alrededor de menús
-- `timelineHTML()` — línea de tiempo reutilizable
-- `proyectoHTML()` — tarjeta de proyecto
-- `expoCardHTML()` — tarjeta de exposición (index)
-- `obraHTML()` — bloque completo de obra (arte)
-- `expoItemHTML()` — bloque completo de exposición (expo)
-
-### Páginas
-Cada página carga `content.js` y `components.js` y llama a las funciones que necesita. Ninguna página tiene texto hardcodeado.
 
 ---
 
-## Formato de obra (arte.html)
+## Arquitectura del sistema
 
-Cada obra en `CONTENIDO.obras` tiene esta estructura:
+Todas las páginas cargan `content.js` y `components.js` y no tienen texto hardcodeado: el contenido vive en `content.js` y el render en `components.js`.
+
+### content.js
+Objeto global `CONTENIDO` con estas secciones:
+
+| Campo | Descripción |
+|-------|-------------|
+| `grupos_texto` | Texto transversal que aparece debajo del título de cada grupo/serie |
+| `bio` | Array de párrafos de la biografía |
+| `perfil` | Texto del perfil profesional (cv.html) |
+| `academico` | `{year, role, place}` |
+| `arte_trayectoria` | `{year, role, desc}` |
+| `laboral` | `{year, role, place}` |
+| `proyectos` | Proyectos del portafolio (cv.html) |
+| `exposiciones` | Exposiciones para cv.html |
+| `obras` | Obras de arte (arte.html, portafolio.html, videos.html) |
+| `expo_list` | Exposiciones (expo.html, portafolio.html) |
+
+### components.js
+Funciones de render compartido:
+
+| Función | Uso |
+|---------|-----|
+| `agregarPuntos(selector, distMax)` | Puntos aleatorios (atom.png) alrededor de menús |
+| `renderMainHeader(id)` | Header principal (index, portafolio, cv) |
+| `renderInnerHeader(id)` | Header interior (bio, arte, expo, videos) con INICIO + menú |
+| `renderObrasAgrupadas(id, renderFn)` | Obras agrupadas por `complemento_titulo` |
+| `timelineHTML(items)` | Línea de tiempo |
+| `proyectoHTML(p)` | Tarjeta de proyecto |
+| `expoCardHTML(e)` | Tarjeta de exposición (cv) |
+| `obraHTML(o)` | Bloque completo de obra (arte/portafolio) |
+| `expoItemHTML(e)` | Bloque completo de exposición |
+| `obraFilaHTML(o)` / `expoFilaHTML(e)` | Layout por filas (legado del portafolio, no usar) |
+| `absolutizarLinks()` | Convierte links relativos a absolutos vs `tachoatomico.poordesigner.com` |
+| `slugify(s)` | Genera slug para clases CSS |
+
+---
+
+## Formato de obra (`CONTENIDO.obras`)
 
 ```js
 {
   titulo: "nombre",
-  complemento_titulo: "serie o categoría",
+  complemento_titulo: "serie o categoría",   // define el grupo
   exposicion: "lugar de exposición (opcional)",
-  año: "2025",
+  año: "2026",
   descripcion: "texto descriptivo",
-  descripcion_extras: ["párrafo extra 1", "párrafo extra 2"], // opcional
+  partes: [          // opcional — sub-partes con su propia imagen/video (ej. KIEP)
+    { titulo: "Karma", imagen: "x.png", video: "videos/x.mp4", texto: "..." }
+  ],
   imgs: ["archivo1.jpg", "archivo2.jpg"],
-  videos: [],
-  links: [
-    { url: "https://...", label: "texto del link" }
-  ]
+  videos: ["videos/archivo.mp4"],
+  links: [{ url: "https://...", label: "texto" }]
 }
 ```
 
-## Formato de exposición (expo.html)
+- Las obras se **agrupan automáticamente** por `complemento_titulo`.
+- El texto del grupo se define en `CONTENIDO.grupos_texto[complemento_titulo]`.
+
+## Formato de exposición (`CONTENIDO.expo_list`)
 
 ```js
 {
   titulo: "nombre",
-  complemento_titulo: "categoría",
+  complemento_titulo: "categoría o colectivo",
   lugar: "lugar físico",
   año: "fecha (ej: Nov/2024)",
-  descripcion: "texto descriptivo (separar párrafos con \\n\\n)",
+  descripcion: "texto (separar párrafos con \\n\\n)",
   imgs: ["archivo1.jpg", ...],
   videos: [],
-  links: [
-    { url: "https://...", label: "texto del link" }
-  ]
+  links: [{ url: "https://...", label: "texto" }]
 }
 ```
 
@@ -102,43 +121,38 @@ Cada obra en `CONTENIDO.obras` tiene esta estructura:
 
 ## Guía: crear una nueva entrada
 
-Cuando digas **"crear nueva entrada"**, se seguirá esta secuencia de preguntas:
+Cuando digas **"crear nueva entrada"**, preguntar en este orden:
 
-### Para una OBRA (arte.html):
+### OBRA (arte.html)
+1. título · 2. complemento-titulo (serie/grupo) · 3. exposición (opcional) · 4. año · 5. descripción · 6. partes (opcional) · 7. imágenes (`imagenes/`) · 8. videos (`videos/`) · 9. links
 
-1. **título** — nombre de la obra
-2. **complemento-titulo** — serie o categoría
-3. **exposición** — ¿tuvo exposición asociada? (si no, se omite)
-4. **año** — año de creación
-5. **descripción** — texto descriptivo
-6. **descripción extras** — ¿párrafos adicionales? (si no, se omite)
-7. **imágenes** — nombres de archivos en `imagenes/`
-8. **videos** — ¿hay videos? (si no, array vacío)
-9. **links** — ¿links asociados? (preguntar URL y texto de cada uno)
-
-### Para una EXPOSICIÓN (expo.html):
-
-1. **título** — nombre de la exposición
-2. **complemento-titulo** — categoría o colectivo
-3. **lugar** — lugar físico donde se realizó
-4. **año** — fecha
-5. **descripción** — texto descriptivo
-6. **imágenes** — nombres de archivos en `imagenes/`
-7. **videos** — ¿hay videos?
-8. **links** — ¿links asociados? (URL + texto)
+### EXPOSICIÓN (expo.html)
+1. título · 2. complemento-titulo · 3. lugar · 4. año/fecha · 5. descripción · 6. imágenes · 7. videos · 8. links
 
 ---
 
-## Tipografías usadas
+## Tipografías y colores
 
-- **Moonline Solid** — títulos (@TACHOATOMICO, menús, títulos de sección)
-- **Courier New** — tagline y meta-tags en header principal
-- **Roboto** — cuerpo de texto en páginas interiores (bio, arte, expo)
-- **Inter** — cuerpo general (index)
+**Tipografías**
+- Moonline Solid — títulos, menús, títulos de sección/grupo
+- Courier New — tagline y meta-tags del header
+- Roboto — cuerpo de texto (bio, arte, expo, portafolio)
+- Inter — cuerpo general (cv)
 
-## Colores
+**Colores**
+- Fucsia `#ff0066` / `#c00080` — tagline, meta-tags, complemento-titulo, links
+- Texto `#555` / `#333` / `#111` — párrafos y títulos
+- Bordes `#e0e0e0` — separadores
 
-- Fucsia: `#ff0066` / `#c00080` — tagline, meta-tags, complemento-titulo
-- Texto general: `#555` / `#333` / `#111`
-- Fondos de tarjetas: `#f5f5f5`
-- Bordes: `#e0e0e0`
+---
+
+## Despliegue
+
+- Repo: `tachoatomico/portal`, rama `main`
+- Coolify hace deploy automático al pushear a `main`
+- Credenciales git: PAT de `tachoatomico` guardado en Windows Credential Manager
+- Ver `docs/contexto_coolify/` para datos del VPS, SSH y flujo de deploy
+
+## Imprimir / exportar PDF
+
+`portafolio.html` y `cv.html` tienen estilos `@media print` (tamaño carta, paginación por secciones/grupos). Para exportar con links clicables usar **"Guardar como PDF"** de Chrome (no "Imprimir").
