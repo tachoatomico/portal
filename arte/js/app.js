@@ -63,6 +63,7 @@
     // Detalles secundarios opcionales
     var detalles = [];
     var campos = [
+      ['series', 'Serie'],
       ['technique', 'Técnica'],
       ['dimensions', 'Dimensiones'],
       ['description', 'Descripción'],
