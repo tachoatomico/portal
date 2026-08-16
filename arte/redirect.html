@@ -21,7 +21,7 @@
 <script>
 (function () {
   var params = new URLSearchParams(window.location.search);
-  var art = params.get('art') || params.get('arte') || params.get('id') || params.get('obra');
+  var art = params.get('art') || params.get('id') || params.get('obra');
   var debug = params.get('debug');
 
   if (debug !== null) {
@@ -31,7 +31,6 @@
       ['search', window.location.search || '(vacío)'],
       ['hash', window.location.hash || '(vacío)'],
       ['art', params.get('art') || '(no)'],
-      ['arte', params.get('arte') || '(no)'],
       ['id', params.get('id') || '(no)'],
       ['obra', params.get('obra') || '(no)'],
       ['resultado', art ? ('#/art/' + art) : '(sin arte)']
