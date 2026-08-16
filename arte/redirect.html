@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTid</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0d0d0d; color: #9a9a9a; font-family: 'Inter', Arial, sans-serif; }
+  p { font-size: 0.9rem; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<p>redirigiendo…</p>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var art = params.get('art') || params.get('id') || params.get('obra');
+
+  if (art) {
+    // redirigir a la app con el id en el hash
+    window.location.replace('./#/art/' + art);
+  } else {
+    // sin parámetro: ir al índice de la app
+    window.location.replace('./');
+  }
+})();
+</script>
+</body>
+</html>
